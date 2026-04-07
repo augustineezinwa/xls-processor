@@ -1,8 +1,10 @@
 "use client";
 
-import { RotateCcw, FileSpreadsheet, Upload, FileDown } from "lucide-react";
+import { useState } from "react";
+import { RotateCcw, FileSpreadsheet, Upload, FileDown, FileText } from "lucide-react";
 import { useWorkbookStore, useSheetMutation } from "@/lib/hooks/useWorkbook";
 import { exportSheetToPDF } from "@/lib/export/pdf-export";
+import { CreateContractDialog } from "@/components/contract/CreateContractDialog";
 import type { ParsedSheet } from "@/types";
 
 interface TableToolbarProps {
@@ -14,6 +16,7 @@ export function TableToolbar({ sheet }: TableToolbarProps) {
   const resetAll = useWorkbookStore((s) => s.resetAll);
   const filename = useWorkbookStore((s) => s.filename) ?? sheet.name;
   const mutation = useSheetMutation(sheet.id);
+  const [isContractOpen, setIsContractOpen] = useState(false);
 
   const deletedCount = mutation?.deletedRowIndices.size ?? 0;
   const editCount = mutation?.editHistory.length ?? 0;
@@ -22,6 +25,7 @@ export function TableToolbar({ sheet }: TableToolbarProps) {
   const dataRowCount = sheet.dataRowCount;
 
   return (
+    <>
     <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-slate-200 rounded-t-xl">
       {/* Left: sheet info */}
       <div className="flex items-center gap-3">
@@ -68,6 +72,22 @@ export function TableToolbar({ sheet }: TableToolbarProps) {
           </button>
         )}
 
+        {/* Create contract */}
+        <button
+          onClick={() => setIsContractOpen(true)}
+          className="
+            flex items-center gap-1.5 px-3 py-1.5
+            text-xs font-medium text-slate-600
+            border border-slate-200 rounded-lg
+            hover:bg-slate-50 hover:border-slate-300
+            transition-colors
+          "
+          title="Create a contract from this sheet"
+        >
+          <FileText className="w-3 h-3" />
+          Create Contract
+        </button>
+
         {/* Export current sheet as PDF */}
         <button
           onClick={() => exportSheetToPDF(sheet, mutation ?? null, filename)}
@@ -101,5 +121,16 @@ export function TableToolbar({ sheet }: TableToolbarProps) {
         </button>
       </div>
     </div>
+
+    {/* Contract dialog — mounted outside the toolbar div so it can be full-screen */}
+    {isContractOpen && (
+      <CreateContractDialog
+        sheet={sheet}
+        mutation={mutation ?? null}
+        filename={filename}
+        onClose={() => setIsContractOpen(false)}
+      />
+    )}
+    </>
   );
 }
