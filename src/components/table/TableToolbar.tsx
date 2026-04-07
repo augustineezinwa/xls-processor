@@ -1,7 +1,8 @@
 "use client";
 
-import { RotateCcw, FileSpreadsheet, Upload } from "lucide-react";
+import { RotateCcw, FileSpreadsheet, Upload, FileDown } from "lucide-react";
 import { useWorkbookStore, useSheetMutation } from "@/lib/hooks/useWorkbook";
+import { exportSheetToPDF } from "@/lib/export/pdf-export";
 import type { ParsedSheet } from "@/types";
 
 interface TableToolbarProps {
@@ -11,6 +12,7 @@ interface TableToolbarProps {
 export function TableToolbar({ sheet }: TableToolbarProps) {
   const resetSheet = useWorkbookStore((s) => s.resetSheet);
   const resetAll = useWorkbookStore((s) => s.resetAll);
+  const filename = useWorkbookStore((s) => s.filename) ?? sheet.name;
   const mutation = useSheetMutation(sheet.id);
 
   const deletedCount = mutation?.deletedRowIndices.size ?? 0;
@@ -65,6 +67,22 @@ export function TableToolbar({ sheet }: TableToolbarProps) {
             Reset changes
           </button>
         )}
+
+        {/* Export current sheet as PDF */}
+        <button
+          onClick={() => exportSheetToPDF(sheet, mutation ?? null, filename)}
+          className="
+            flex items-center gap-1.5 px-3 py-1.5
+            text-xs font-medium text-slate-600
+            border border-slate-200 rounded-lg
+            hover:bg-slate-50 hover:border-slate-300
+            transition-colors
+          "
+          title="Download current sheet as PDF"
+        >
+          <FileDown className="w-3 h-3" />
+          Export PDF
+        </button>
 
         {/* Upload new file */}
         <button

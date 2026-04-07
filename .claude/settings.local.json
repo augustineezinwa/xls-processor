@@ -55,7 +55,10 @@
       "Bash(PATH=\"/Users/augustineezinwa/.nvm/versions/node/v20.18.0/bin:$PATH\" node -e \":*)",
       "Bash(PATH=\"/Users/augustineezinwa/.nvm/versions/node/v20.18.0/bin:$PATH\" node scripts/test-parse.mjs)",
       "Bash(~/.nvm/versions/node/v20.18.0/bin/node scripts/test-parse.mjs)",
-      "Bash(lsof -i :3000)"
+      "Bash(lsof -i :3000)",
+      "Bash(npm install jspdf jspdf-autotable)",
+      "Bash(ls -lt /Users/augustineezinwa/Downloads/test-quote*.pdf)",
+      "Bash(strings \"/Users/augustineezinwa/Downloads/test-quote \\(1\\).pdf\")"
     ]
   }
 }
