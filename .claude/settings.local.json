@@ -36,7 +36,26 @@
       "Bash(npm show @tanstack/react-table --json)",
       "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(''Peer deps:'', d.get\\(''peerDependencies'',{}\\)\\)\")",
       "Bash(npm show next --json)",
-      "Bash(npx create-next-app@latest xcel-quotes-processor --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-turbopack)"
+      "Bash(npx create-next-app@latest xcel-quotes-processor --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-turbopack)",
+      "Bash(export NVM_DIR=\"$HOME/.nvm\")",
+      "Bash(source \"$NVM_DIR/nvm.sh\")",
+      "Bash(nvm use 20.18.0)",
+      "Bash(npm install exceljs @formulajs/formulajs @tanstack/react-table zustand immer react-dropzone lucide-react)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(source ~/.zshrc)",
+      "Bash(source ~/.bashrc)",
+      "Bash(~/.nvm/versions/node/v20.18.0/bin/node --version)",
+      "Bash(~/.nvm/versions/node/v20.18.0/bin/npx tsc --noEmit)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(lsof -ti :3000)",
+      "Bash(xargs kill -9)",
+      "Bash(xargs kill -9 echo \"killed\")",
+      "Bash(PATH=\"/Users/augustineezinwa/.nvm/versions/node/v20.18.0/bin:$PATH\" node scripts/create-test-xlsx.mjs)",
+      "Bash(curl -s -X POST http://localhost:3000/api/parse-excel -F \"file=@/Users/augustineezinwa/Desktop/xcel-quotes-processor/public/test-quote.xlsx\" )",
+      "Bash(PATH=\"/Users/augustineezinwa/.nvm/versions/node/v20.18.0/bin:$PATH\" node -e \":*)",
+      "Bash(PATH=\"/Users/augustineezinwa/.nvm/versions/node/v20.18.0/bin:$PATH\" node scripts/test-parse.mjs)",
+      "Bash(~/.nvm/versions/node/v20.18.0/bin/node scripts/test-parse.mjs)",
+      "Bash(lsof -i :3000)"
     ]
   }
 }
