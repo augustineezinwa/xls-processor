@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:docs.sheetjs.com)",
+      "WebFetch(domain:www.pkgpulse.com)",
+      "WebFetch(domain:zetcode.com)",
+      "WebFetch(domain:builtin.com)",
+      "WebFetch(domain:blog.tericcabrel.com)",
+      "Bash(node --version)",
+      "Bash(npm --version)",
+      "Bash(npm show exceljs version)",
+      "Bash(npm show exceljs description)",
+      "Bash(npm show hot-formula-parser version)",
+      "Bash(npm show @formulajs/formulajs version)",
+      "Bash(npm show next version)",
+      "Bash(npm show typescript version)",
+      "Bash(npm show tailwindcss version)",
+      "Bash(npm show @tanstack/react-table version)",
+      "Bash(npm show zustand version)",
+      "Bash(npm show react-dropzone version)",
+      "Bash(npm show immer version)",
+      "Bash(npm show formula-parser version)",
+      "Bash(npm show hot-formula-parser description)",
+      "Bash(npm show @formulajs/formulajs description)",
+      "Bash(npm show hot-formula-parser exports)",
+      "Bash(npm show exceljs dependencies)",
+      "Bash(npm show multer version)",
+      "Bash(npm show formidable version)",
+      "Bash(npm show busboy version)",
+      "Bash(npm show clsx version)",
+      "Bash(npm show lucide-react version)",
+      "Bash(npm show @radix-ui/react-dialog version)",
+      "Bash(npm show exceljs --json)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(''Keywords:'', d.get\\(''keywords'',[]\\)\\); print\\(''Main exports:'', list\\(d.get\\(''exports'',{}\\).keys\\(\\)\\)[:5] if d.get\\(''exports''\\) else ''none''\\)\")",
+      "Bash(npm pack exceljs --dry-run)",
+      "Bash(npm show @tanstack/react-table --json)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(''Peer deps:'', d.get\\(''peerDependencies'',{}\\)\\)\")",
+      "Bash(npm show next --json)",
+      "Bash(npx create-next-app@latest xcel-quotes-processor --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-turbopack)"
+    ]
+  }
+}
