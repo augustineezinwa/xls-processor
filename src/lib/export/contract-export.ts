@@ -65,10 +65,10 @@ function resolveCellValue(
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-function drawDivider(doc: jsPDF, y: number) {
+function drawDivider(doc: jsPDF, y: number, pageWidth: number) {
   doc.setDrawColor(...C.slate200);
   doc.setLineWidth(0.25);
-  doc.line(20, y, 190, y);
+  doc.line(20, y, pageWidth - 20, y);
 }
 
 function sectionHeading(doc: jsPDF, text: string, y: number) {
@@ -99,18 +99,29 @@ export function exportContractToPDF({
   const cellOverrides = mutation?.cells ?? {};
   const deletedRows   = mutation?.deletedRowIndices ?? new Set<number>();
 
-  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  // ── Orientation: landscape when the sheet has ≥7 columns ─────────────────
+  const useLandscape   = sheet.columns.length >= 7;
+  const orientation    = (useLandscape ? "landscape" : "portrait") as "landscape" | "portrait";
+  const doc = new jsPDF({ orientation, unit: "mm", format: "a4" });
+
+  // Derived layout constants — all downstream positions use these
+  const pageWidth      = doc.internal.pageSize.getWidth();  // 210 portrait / 297 landscape
+  const centerX        = pageWidth / 2;                     // 105  / 148.5
+  const availableWidth = pageWidth - 40;                    // 170  / 257
+  // Right signature block starts just past centre; underline fills each half
+  const rightSigX  = Math.round(centerX) + 7;              // 112  / 156
+  const sigLineLen = Math.round(availableWidth / 2) - 24;  // 61   / 104
 
   // ── 1. Header ──────────────────────────────────────────────────────────────
   doc.setFont("helvetica", "bold");
   doc.setFontSize(18);
   doc.setTextColor(...C.slate800);
-  doc.text("CONTRACT AGREEMENT", 105, 20, { align: "center" });
+  doc.text("CONTRACT AGREEMENT", centerX, 20, { align: "center" });
 
-  // Decorative underline beneath title
+  // Decorative underline beneath title (symmetric around page centre)
   doc.setDrawColor(...C.slate200);
   doc.setLineWidth(0.4);
-  doc.line(50, 23, 160, 23);
+  doc.line(centerX - 55, 23, centerX + 55, 23);
 
   // Date of agreement
   const formattedDate = agreementDate
@@ -122,11 +133,11 @@ export function exportContractToPDF({
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9.5);
   doc.setTextColor(...C.slate600);
-  doc.text(`Date of Agreement:  ${formattedDate}`, 105, 31, { align: "center" });
+  doc.text(`Date of Agreement:  ${formattedDate}`, centerX, 31, { align: "center" });
 
   // ── 2. Parties ─────────────────────────────────────────────────────────────
   let y = 42;
-  drawDivider(doc, y);
+  drawDivider(doc, y, pageWidth);
   y += 7;
   sectionHeading(doc, "Parties", y);
   y += 6;
@@ -149,7 +160,7 @@ export function exportContractToPDF({
   y += 13;
 
   // ── 3. Schedule of Works ───────────────────────────────────────────────────
-  drawDivider(doc, y);
+  drawDivider(doc, y, pageWidth);
   y += 7;
   sectionHeading(doc, "Schedule of Works", y);
   y += 4;
@@ -209,11 +220,11 @@ export function exportContractToPDF({
     if (cells.length > 0) tableBody.push(cells);
   }
 
-  // Proportional column widths (170 mm available)
+  // Proportional column widths — scales to availableWidth (170 portrait / 257 landscape)
   const totalCharW = sheet.columns.reduce((s, c) => s + Math.max(c.width ?? 8, 8), 0);
   const colStyles: Record<number, { cellWidth: number }> = {};
   sheet.columns.forEach((col, i) => {
-    colStyles[i] = { cellWidth: Math.round((Math.max(col.width ?? 8, 8) / totalCharW) * 170 * 10) / 10 };
+    colStyles[i] = { cellWidth: Math.round((Math.max(col.width ?? 8, 8) / totalCharW) * availableWidth * 10) / 10 };
   });
 
   // Hidden head row to fix column count (same technique as pdf-export.ts)
@@ -241,7 +252,7 @@ export function exportContractToPDF({
   };
 
   checkY(20);
-  drawDivider(doc, y);
+  drawDivider(doc, y, pageWidth);
   y += 7;
   sectionHeading(doc, "Terms & Conditions", y);
   y += 5;
@@ -250,7 +261,7 @@ export function exportContractToPDF({
   doc.setFontSize(8.5);
   doc.setTextColor(...C.slate800);
 
-  const lines = doc.splitTextToSize(contractBody, 170);
+  const lines = doc.splitTextToSize(contractBody, availableWidth);
   for (const line of lines) {
     checkY(5);
     doc.text(line, 20, y);
@@ -260,14 +271,14 @@ export function exportContractToPDF({
 
   // ── 5. Signatures ──────────────────────────────────────────────────────────
   checkY(55);
-  drawDivider(doc, y);
+  drawDivider(doc, y, pageWidth);
   y += 7;
   sectionHeading(doc, "Signatures", y);
   y += 7;
 
   const sigBlocks: Array<{ x: number; label: string }> = [
-    { x: 20,  label: "Supplier / Provider" },
-    { x: 112, label: "Client / Buyer"      },
+    { x: 20,       label: "Supplier / Provider" },
+    { x: rightSigX, label: "Client / Buyer"     },
   ];
 
   const sigLines = ["Name", "Signature", "Date"];
@@ -292,7 +303,7 @@ export function exportContractToPDF({
       doc.setDrawColor(...C.gray400);
       doc.setLineWidth(0.3);
       const lineStartX = block.x + 22;
-      doc.line(lineStartX, y, lineStartX + 62, y);
+      doc.line(lineStartX, y, lineStartX + sigLineLen, y);
     }
     y += 9;
   }
@@ -306,7 +317,7 @@ export function exportContractToPDF({
     doc.setTextColor(...C.gray400);
     doc.text(
       `Page ${p} of ${totalPages}  ·  contract-agreement`,
-      105, pageH - 8, { align: "center" }
+      centerX, pageH - 8, { align: "center" }
     );
   }
 

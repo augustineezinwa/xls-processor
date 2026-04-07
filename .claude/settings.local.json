@@ -60,7 +60,11 @@
       "Bash(ls -lt /Users/augustineezinwa/Downloads/test-quote*.pdf)",
       "Bash(strings \"/Users/augustineezinwa/Downloads/test-quote \\(1\\).pdf\")",
       "Bash(npm install @tanstack/react-virtual)",
-      "Bash(node -e \":*)"
+      "Bash(node -e \":*)",
+      "Bash(strings ~/Downloads/\"ORC_FISHING_Statement_Updated \\(2\\).pdf\")",
+      "Bash(strings \"/Users/augustineezinwa/Downloads/ORC_FISHING_Statement_Updated \\(2\\).pdf\")",
+      "Bash(ls -lt ~/Downloads/test-quote*.pdf)",
+      "Bash(strings \"/Users/augustineezinwa/Downloads/test-quote \\(4\\).pdf\")"
     ]
   }
 }

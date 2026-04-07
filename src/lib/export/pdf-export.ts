@@ -155,9 +155,14 @@ export function exportSheetToPDF(
 
   if (tableBody.length === 0) return; // nothing to export
 
+  // ── Orientation: landscape when the sheet has ≥7 columns ───────────────
+  // Portrait A4:  210 mm total − 40 mm margins = 170 mm available
+  // Landscape A4: 297 mm total − 40 mm margins = 257 mm available
+  const useLandscape = sheet.columns.length >= 7;
+  const orientation  = (useLandscape ? "landscape" : "portrait") as "landscape" | "portrait";
+  const AVAILABLE_WIDTH_MM = useLandscape ? 257 : 170;
+
   // ── Proportional column widths ──────────────────────────────────────────
-  // Available width: 210mm (A4) − 20mm left − 20mm right = 170mm
-  const AVAILABLE_WIDTH_MM = 170;
   const totalCharWidth = sheet.columns.reduce(
     (sum, c) => sum + Math.max(c.width ?? 8, 8),
     0
@@ -169,7 +174,7 @@ export function exportSheetToPDF(
   });
 
   // ── Create PDF document ─────────────────────────────────────────────────
-  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const doc = new jsPDF({ orientation, unit: "mm", format: "a4" });
 
   // Document title header
   const strippedName = filename.replace(/\.(xlsx|xls|xlsm|csv)$/i, "");
