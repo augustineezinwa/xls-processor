@@ -4,6 +4,23 @@ import { useState, useRef, useEffect, useCallback, memo } from "react";
 import { parseInputValue, formatCellValue } from "@/lib/utils/number-format";
 import type { ParsedCell } from "@/types";
 
+/**
+ * Return white or dark-slate text depending on the perceived luminance of a
+ * hex background colour, ensuring WCAG-level contrast on any coloured cell.
+ *
+ * Formula: ITU-R BT.601 perceived brightness
+ *   Y = (0.299·R + 0.587·G + 0.114·B) / 255
+ * Threshold 0.55 gives white text on medium-to-dark colours and dark text on
+ * pastels / light tints.
+ */
+function deriveTextColor(bgHex: string): string {
+  const r = parseInt(bgHex.slice(1, 3), 16);
+  const g = parseInt(bgHex.slice(3, 5), 16);
+  const b = parseInt(bgHex.slice(5, 7), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance < 0.55 ? "#ffffff" : "#1e293b"; // white or slate-800
+}
+
 interface EditableCellProps {
   cell: ParsedCell;
   currentValue: string | number | null;
@@ -75,12 +92,15 @@ function EditableCellInner({
     }
   };
 
-  // Cell style from Excel formatting
+  // Cell style from Excel formatting.
+  // When a cell has a background colour but no explicit font colour, derive a
+  // contrasting text colour so the label remains readable on any background.
   const cellStyle: React.CSSProperties = {
     fontWeight: cell.isBold ? "bold" : undefined,
     fontStyle: cell.isItalic ? "italic" : undefined,
     backgroundColor: cell.backgroundColor ?? undefined,
-    color: cell.fontColor ?? undefined,
+    color:
+      cell.fontColor ?? (cell.backgroundColor ? deriveTextColor(cell.backgroundColor) : undefined),
     ...style,
   };
 

@@ -53,6 +53,22 @@ export function classifyRows(rows: RawRow[], formulaMap: FormulaMap, totalRows: 
     const boldCells = nonEmpty.filter((c) => c.isBold);
     const formulaCells = nonEmpty.filter((c) => c.formulaString !== null);
 
+    // Detect string cells that represent numeric values.
+    // Accounting software (QuickBooks, Sage, bank exports) often stores
+    // amounts as text strings with currency symbols: "₱1,234.56", "$500.00".
+    // These cells have typeof rawValue === "string" so they're missed by numCells.
+    const numericStringCells = nonEmpty.filter((c) => {
+      if (c.formulaString !== null || typeof c.rawValue !== "string") return false;
+      const trimmed = (c.rawValue as string).trim();
+      // Strip leading currency / parenthesis (negative), then thousands commas
+      const stripped = trimmed
+        .replace(/^[$€£¥₱\s(]+/, "")
+        .replace(/,/g, "")
+        .replace(/\)$/, "");
+      const num = parseFloat(stripped);
+      return !isNaN(num) && isFinite(num) && stripped.length > 0 && /^-?[\d.]+$/.test(stripped);
+    });
+
     const rootFormulaCell = formulaCells.find((c) => {
       const entry = addressToFormula.get(c.address);
       return entry && entry.isRoot && entry.computationAxis === "column";
@@ -76,6 +92,7 @@ export function classifyRows(rows: RawRow[], formulaMap: FormulaMap, totalRows: 
       nonEmpty,
       textCells,
       numCells,
+      numericStringCells,
       boldCells,
       formulaCells,
       rootFormulaCell,
@@ -114,15 +131,19 @@ export function classifyRows(rows: RawRow[], formulaMap: FormulaMap, totalRows: 
       continue;
     }
 
-    // All text → candidate for header or section
-    if (stats.numCells.length === 0 && stats.textCells.length > 0) {
+    // All text (and no numeric-looking strings) → candidate for header or section
+    if (
+      stats.numCells.length === 0 &&
+      stats.numericStringCells.length === 0 &&
+      stats.textCells.length > 0
+    ) {
       // Will refine in pass 2
       types[i] = "section";
       continue;
     }
 
-    // Has numbers but no formula refs → plain data row
-    if (stats.numCells.length > 0) {
+    // Has numbers (or numeric-looking text strings) but no formula refs → plain data row
+    if (stats.numCells.length > 0 || stats.numericStringCells.length > 0) {
       types[i] = "data";
       if (firstDataRowIndex === -1) firstDataRowIndex = i;
       continue;
@@ -154,6 +175,25 @@ export function classifyRows(rows: RawRow[], formulaMap: FormulaMap, totalRows: 
       const prev = types[i - 1];
       const next = types[i + 1];
       if ((prev === "data" || prev === "subtotal") && (next === "data" || next === "subtotal")) {
+        types[i] = "data";
+      }
+    }
+  }
+
+  // ── Pass 4: Fallback for sheets with no editable rows ─────────────────────
+  // Handles any unusual structure that slipped through Passes 1–3
+  // (e.g., account statements where ALL numeric values are text-typed cells
+  // that don't match any numeric-string pattern, or other exotic layouts).
+  // Rather than showing "0 items / not editable", promote non-blank content
+  // rows after the identified header row so the user can at least view and
+  // edit the sheet.
+  const hasAnyEditable = types.some((t) => t === "data" || t === "subtotal" || t === "total");
+  if (!hasAnyEditable) {
+    const lastHeaderIdx = types.lastIndexOf("header");
+    const startIdx = lastHeaderIdx >= 0 ? lastHeaderIdx + 1 : 0;
+
+    for (let i = startIdx; i < rows.length; i++) {
+      if ((types[i] === "section" || types[i] === "unknown") && rowStats[i].nonEmpty.length > 0) {
         types[i] = "data";
       }
     }
