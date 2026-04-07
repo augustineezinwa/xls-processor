@@ -58,7 +58,9 @@
       "Bash(lsof -i :3000)",
       "Bash(npm install jspdf jspdf-autotable)",
       "Bash(ls -lt /Users/augustineezinwa/Downloads/test-quote*.pdf)",
-      "Bash(strings \"/Users/augustineezinwa/Downloads/test-quote \\(1\\).pdf\")"
+      "Bash(strings \"/Users/augustineezinwa/Downloads/test-quote \\(1\\).pdf\")",
+      "Bash(npm install @tanstack/react-virtual)",
+      "Bash(node -e \":*)"
     ]
   }
 }

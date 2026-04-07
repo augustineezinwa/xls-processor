@@ -186,7 +186,8 @@ export async function recomputeAll(
 
   const recomputed: Record<string, number | string | null> = {};
 
-  for (const entry of sortedFormulas) {
+  for (let i = 0; i < sortedFormulas.length; i++) {
+    const entry = sortedFormulas[i];
     if (deletedAddresses.has(entry.address)) continue;
 
     const getValue = (a: string): number | string | null => {
@@ -197,6 +198,13 @@ export async function recomputeAll(
     const result = await evaluateFormula(entry.formulaString, getValue, formulajs);
     values[entry.address] = result;
     recomputed[entry.address] = result;
+
+    // Yield to the event loop every 50 formulas so the main thread can
+    // process pointer/keyboard events and the UI stays responsive during
+    // large recomputations (e.g. row deletion on an 11k-row sheet).
+    if (i > 0 && i % 50 === 0) {
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    }
   }
 
   return recomputed;

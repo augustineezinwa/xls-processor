@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, memo } from "react";
 import { parseInputValue, formatCellValue } from "@/lib/utils/number-format";
 import type { ParsedCell } from "@/types";
 
@@ -17,7 +17,7 @@ interface EditableCellProps {
   className?: string;
 }
 
-export function EditableCell({
+function EditableCellInner({
   cell,
   currentValue,
   isEditable,
@@ -145,3 +145,18 @@ export function EditableCell({
     </td>
   );
 }
+
+/**
+ * Memoized EditableCell — only re-renders when its own value, editability,
+ * or the stable onEdit callback changes.  This prevents the full-table
+ * re-render cascade that fires on every cell mutation.
+ */
+export const EditableCell = memo(EditableCellInner, (prev, next) => {
+  return (
+    prev.currentValue === next.currentValue &&
+    prev.isEditable === next.isEditable &&
+    prev.onEdit === next.onEdit &&
+    prev.cell.address === next.cell.address &&
+    prev.className === next.className
+  );
+});
