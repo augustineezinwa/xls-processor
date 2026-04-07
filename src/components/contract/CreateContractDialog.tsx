@@ -54,20 +54,26 @@ function resolveLiveValue(
 
 // ─── Row-type → Tailwind classes (mirrors SpreadsheetTable) ───────────────────
 const ROW_CLASS: Record<string, string> = {
-  header:   "bg-slate-800 text-white text-xs font-semibold tracking-wide",
-  section:  "bg-slate-100 text-slate-500 italic text-sm",
+  header: "bg-slate-800 text-white text-xs font-semibold tracking-wide",
+  section: "bg-slate-100 text-slate-500 italic text-sm",
   subtotal: "bg-amber-50 font-semibold text-sm",
-  total:    "bg-blue-50 font-bold text-sm border-t-2 border-blue-200",
-  data:     "bg-white text-sm",
-  unknown:  "bg-white text-slate-400 text-sm",
+  total: "bg-blue-50 font-bold text-sm border-t-2 border-blue-200",
+  data: "bg-white text-sm",
+  unknown: "bg-white text-slate-400 text-sm",
 };
 
 type HAlign = "left" | "center" | "right";
 function colAlign(semanticType: string | undefined): HAlign {
   switch (semanticType) {
-    case "quantity": case "unit_price": case "amount": case "percentage": return "right";
-    case "identifier": return "center";
-    default: return "left";
+    case "quantity":
+    case "unit_price":
+    case "amount":
+    case "percentage":
+      return "right";
+    case "identifier":
+      return "center";
+    default:
+      return "left";
   }
 }
 
@@ -108,13 +114,13 @@ export function CreateContractDialog({
   filename,
   onClose,
 }: CreateContractDialogProps) {
-  const [partyA, setPartyA]         = useState("");
-  const [partyB, setPartyB]         = useState("");
-  const [agreementDate, setDate]    = useState(new Date().toISOString().split("T")[0]);
-  const [contractBody, setBody]     = useState(DEFAULT_CONTRACT_TEXT);
+  const [partyA, setPartyA] = useState("");
+  const [partyB, setPartyB] = useState("");
+  const [agreementDate, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [contractBody, setBody] = useState(DEFAULT_CONTRACT_TEXT);
 
   const cellOverrides = mutation?.cells ?? {};
-  const deletedRows   = mutation?.deletedRowIndices ?? new Set<number>();
+  const deletedRows = mutation?.deletedRowIndices ?? new Set<number>();
 
   const handlePrint = () => {
     exportContractToPDF({ sheet, mutation, partyA, partyB, agreementDate, contractBody });
@@ -124,11 +130,12 @@ export function CreateContractDialog({
     /* Backdrop */
     <div
       className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-start justify-center overflow-y-auto py-8 px-4"
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
     >
       {/* Panel */}
       <div className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl flex flex-col">
-
         {/* Dialog header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 shrink-0">
           <div>
@@ -148,7 +155,6 @@ export function CreateContractDialog({
 
         {/* Scrollable contract body */}
         <div className="overflow-y-auto flex-1 px-8 py-8">
-
           {/* ── Contract title ── */}
           <div className="text-center mb-6">
             <h1 className="text-2xl font-bold text-slate-800 tracking-tight">CONTRACT AGREEMENT</h1>
@@ -215,25 +221,32 @@ export function CreateContractDialog({
             <table className="w-full border-collapse text-sm">
               <tbody>
                 {sheet.rows
-                  .filter(row => row.type !== "blank" && !deletedRows.has(row.index))
-                  .map(row => {
+                  .filter((row) => row.type !== "blank" && !deletedRows.has(row.index))
+                  .map((row) => {
                     const rowClass = ROW_CLASS[row.type] ?? ROW_CLASS.data;
                     return (
-                      <tr key={row.index} className={`${rowClass} border-b border-slate-100 last:border-0`}>
-                        {row.cells.map(cell => {
+                      <tr
+                        key={row.index}
+                        className={`${rowClass} border-b border-slate-100 last:border-0`}
+                      >
+                        {row.cells.map((cell) => {
                           if (cell.isMergeChild) return null;
 
                           const live = resolveLiveValue(
-                            cell.address, cell.rawValue, cell.cachedResult,
-                            cell.formulaString, cellOverrides
+                            cell.address,
+                            cell.rawValue,
+                            cell.cachedResult,
+                            cell.formulaString,
+                            cellOverrides
                           );
-                          const display = row.type === "header"
-                            ? String(cell.rawValue ?? cell.displayValue ?? "")
-                            : formatCellValue(live, cell.numberFormat, live as number, null);
+                          const display =
+                            row.type === "header"
+                              ? String(cell.rawValue ?? cell.displayValue ?? "")
+                              : formatCellValue(live, cell.numberFormat, live as number, null);
 
                           const colLetter = cell.address.match(/[A-Z]+/)?.[0] ?? "";
-                          const colDef    = sheet.columns.find(c => c.letter === colLetter);
-                          const align     = colAlign(colDef?.semanticType);
+                          const colDef = sheet.columns.find((c) => c.letter === colLetter);
+                          const align = colAlign(colDef?.semanticType);
 
                           return (
                             <td
@@ -242,7 +255,7 @@ export function CreateContractDialog({
                               className={`px-3 py-2 text-${align}`}
                               style={{
                                 fontWeight: cell.isBold ? "bold" : undefined,
-                                fontStyle:  cell.isItalic ? "italic" : undefined,
+                                fontStyle: cell.isItalic ? "italic" : undefined,
                               }}
                             >
                               {display}

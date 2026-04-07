@@ -6,12 +6,7 @@ import { enableMapSet } from "immer";
 
 // Enable Immer's MapSet plugin so Set/Map mutations work inside Zustand immer middleware
 enableMapSet();
-import type {
-  ParsedWorkbook,
-  SheetMutation,
-  AppStatus,
-  CellEdit,
-} from "@/types";
+import type { ParsedWorkbook, SheetMutation, AppStatus, CellEdit } from "@/types";
 
 interface WorkbookStore {
   // Parsed workbook from the server — immutable after initial load
@@ -35,10 +30,7 @@ interface WorkbookStore {
     value: string | number | null,
     previousValue?: string | number | null
   ) => void;
-  batchUpdateCells: (
-    sheetId: string,
-    updates: Record<string, string | number | null>
-  ) => void;
+  batchUpdateCells: (sheetId: string, updates: Record<string, string | number | null>) => void;
 
   // Row deletion
   deleteRow: (sheetId: string, rowIndex: number, rowAddresses: string[]) => void;
@@ -172,9 +164,7 @@ export function useActiveSheet() {
 }
 
 export function useSheetMutation(sheetId: string | undefined) {
-  return useWorkbookStore((s) =>
-    sheetId ? (s.mutations[sheetId] ?? null) : null
-  );
+  return useWorkbookStore((s) => (sheetId ? (s.mutations[sheetId] ?? null) : null));
 }
 
 /** Get the current live value for a cell (mutation override or original). */

@@ -1,7 +1,7 @@
 import type { ColumnSemanticType, ParsedColumn } from "@/types";
 
 interface ColumnSample {
-  index: number;   // 0-based
+  index: number; // 0-based
   letter: string;
   headerText: string;
   width: number;
@@ -21,9 +21,7 @@ interface ColumnSample {
 export function inferColumns(samples: ColumnSample[]): ParsedColumn[] {
   return samples.map((col) => {
     const allValues = col.dataCellValues;
-    const nonEmpty = allValues.filter(
-      (v) => v !== null && v !== undefined && v !== ""
-    );
+    const nonEmpty = allValues.filter((v) => v !== null && v !== undefined && v !== "");
     const numericCount = nonEmpty.filter((v) => typeof v === "number").length;
 
     // Treat formula cells (even with null cached result) as numeric candidates.
@@ -34,17 +32,13 @@ export function inferColumns(samples: ColumnSample[]): ParsedColumn[] {
     );
     const adjustedNumericCount = numericCount + nullFormulaCount;
     const totalForRatio = nonEmpty.length + nullFormulaCount;
-    const numericRatio =
-      totalForRatio > 0 ? adjustedNumericCount / totalForRatio : 0;
+    const numericRatio = totalForRatio > 0 ? adjustedNumericCount / totalForRatio : 0;
 
     const header = col.headerText.toLowerCase().trim();
     const numFmts = col.dataNumberFormats.filter(Boolean) as string[];
     const hasCurrencyFmt = numFmts.some(
       (f) =>
-        f.includes("$") ||
-        f.includes("£") ||
-        f.includes("€") ||
-        f.toLowerCase().includes("curr")
+        f.includes("$") || f.includes("£") || f.includes("€") || f.toLowerCase().includes("curr")
     );
     const hasPercentFmt = numFmts.some((f) => f.includes("%"));
 
@@ -55,16 +49,11 @@ export function inferColumns(samples: ColumnSample[]): ParsedColumn[] {
         semanticType = "amount";
       } else if (hasPercentFmt || /percent|%|disc/i.test(header)) {
         semanticType = "percentage";
-      } else if (
-        hasCurrencyFmt ||
-        /price|rate|cost|unit\s*price|up|u\/price/i.test(header)
-      ) {
+      } else if (hasCurrencyFmt || /price|rate|cost|unit\s*price|up|u\/price/i.test(header)) {
         semanticType = "unit_price";
       } else if (/amount|total|value|ext|subtotal|sum/i.test(header)) {
         semanticType = "amount";
-      } else if (
-        /qty|quantity|count|no\.|#|units|pcs|pieces|ea\./i.test(header)
-      ) {
+      } else if (/qty|quantity|count|no\.|#|units|pcs|pieces|ea\./i.test(header)) {
         semanticType = "quantity";
       } else {
         // Default for numeric-heavy columns without clear header: amount

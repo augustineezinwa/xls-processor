@@ -70,8 +70,7 @@ export function substituteRefs(
 
   // 1. Replace range references with arrays
   //    e.g. SUM(D2:D10) → SUM([10,20,30,...])
-  const rangeRegex =
-    /\$?([A-Z]{1,3})\$?([1-9][0-9]*)\s*:\s*\$?([A-Z]{1,3})\$?([1-9][0-9]*)/gi;
+  const rangeRegex = /\$?([A-Z]{1,3})\$?([1-9][0-9]*)\s*:\s*\$?([A-Z]{1,3})\$?([1-9][0-9]*)/gi;
 
   const rangeMatches = Array.from(expr.matchAll(rangeRegex));
 

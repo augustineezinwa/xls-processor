@@ -38,11 +38,7 @@ export function formatCellValue(
       }
 
       if (fmt.includes("$") || fmt.includes("£") || fmt.includes("€")) {
-        const symbol = fmt.includes("$")
-          ? "$"
-          : fmt.includes("£")
-          ? "£"
-          : "€";
+        const symbol = fmt.includes("$") ? "$" : fmt.includes("£") ? "£" : "€";
         const decimals = (fmt.match(/0\.(0+)/) ?? [])[1]?.length ?? 2;
         return `${symbol}${displayValue.toLocaleString(undefined, {
           minimumFractionDigits: decimals,

@@ -26,9 +26,7 @@ export default function Home() {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-red-100 mb-4">
             <AlertCircle className="w-8 h-8 text-red-500" />
           </div>
-          <h2 className="text-xl font-bold text-slate-800 mb-2">
-            Failed to process file
-          </h2>
+          <h2 className="text-xl font-bold text-slate-800 mb-2">Failed to process file</h2>
           <p className="text-slate-500 text-sm mb-6">
             {errorMessage ?? "An unexpected error occurred."}
           </p>

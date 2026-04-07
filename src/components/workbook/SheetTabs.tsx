@@ -32,9 +32,7 @@ export function SheetTabs({ sheets, activeIndex }: SheetTabsProps) {
           {sheet.name}
           <span
             className={`text-xs px-1.5 py-0.5 rounded-full ${
-              i === activeIndex
-                ? "bg-blue-100 text-blue-600"
-                : "bg-slate-200 text-slate-400"
+              i === activeIndex ? "bg-blue-100 text-blue-600" : "bg-slate-200 text-slate-400"
             }`}
           >
             {sheet.dataRowCount}

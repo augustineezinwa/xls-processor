@@ -14,8 +14,7 @@ interface SpreadsheetTableProps {
 
 export function SpreadsheetTable({ sheet }: SpreadsheetTableProps) {
   const mutation = useSheetMutation(sheet.id);
-  const { handleCellEdit, handleRowDelete, handleRowRestore } =
-    useFormulaEngine(sheet);
+  const { handleCellEdit, handleRowDelete, handleRowRestore } = useFormulaEngine(sheet);
 
   const deletedRows = mutation?.deletedRowIndices ?? new Set<number>();
   const cellOverrides = mutation?.cells ?? {};
@@ -50,8 +49,7 @@ export function SpreadsheetTable({ sheet }: SpreadsheetTableProps) {
 
   // Row type → visual style
   const rowStyle: Record<string, string> = {
-    header:
-      "bg-slate-800 text-white font-semibold text-xs uppercase tracking-wide",
+    header: "bg-slate-800 text-white font-semibold text-xs uppercase tracking-wide",
     data: "hover:bg-slate-50/80 transition-colors",
     subtotal: "bg-amber-50/60 font-medium",
     total: "bg-blue-50 font-bold border-t-2 border-blue-300",
@@ -98,11 +96,8 @@ export function SpreadsheetTable({ sheet }: SpreadsheetTableProps) {
 
   // Stable onEdit callback — prevents EditableCell memo invalidation on re-renders
   const stableOnEdit = useCallback(
-    (
-      addr: string,
-      newVal: string | number | null,
-      prevVal: string | number | null
-    ) => handleCellEdit(addr, newVal, prevVal),
+    (addr: string, newVal: string | number | null, prevVal: string | number | null) =>
+      handleCellEdit(addr, newVal, prevVal),
     [handleCellEdit]
   );
 
@@ -120,25 +115,17 @@ export function SpreadsheetTable({ sheet }: SpreadsheetTableProps) {
   const totalSize = rowVirtualizer.getTotalSize();
   const paddingTop = virtualItems.length > 0 ? virtualItems[0].start : 0;
   const paddingBottom =
-    virtualItems.length > 0
-      ? totalSize - virtualItems[virtualItems.length - 1].end
-      : 0;
+    virtualItems.length > 0 ? totalSize - virtualItems[virtualItems.length - 1].end : 0;
 
   // ── Row renderer helper ────────────────────────────────────────────────────
-  const renderRow = (
-    row: (typeof visibleRows)[number],
-    key: number | string
-  ) => {
+  const renderRow = (row: (typeof visibleRows)[number], key: number | string) => {
     const rStyle = rowStyle[row.type] ?? "";
     const isDeleted = row.isDeleted;
 
     if (row.type === "blank") {
       return (
         <tr key={key} className="h-2">
-          <td
-            colSpan={sheet.columns.length + 1}
-            className="border-0 bg-slate-50"
-          />
+          <td colSpan={sheet.columns.length + 1} className="border-0 bg-slate-50" />
         </tr>
       );
     }
@@ -243,10 +230,7 @@ export function SpreadsheetTable({ sheet }: SpreadsheetTableProps) {
           {/* Top spacer — represents rows above the virtual window */}
           {paddingTop > 0 && (
             <tr>
-              <td
-                colSpan={sheet.columns.length + 1}
-                style={{ height: paddingTop, padding: 0 }}
-              />
+              <td colSpan={sheet.columns.length + 1} style={{ height: paddingTop, padding: 0 }} />
             </tr>
           )}
 

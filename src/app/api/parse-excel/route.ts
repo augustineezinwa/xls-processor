@@ -75,8 +75,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, workbook });
   } catch (err: unknown) {
-    const message =
-      err instanceof Error ? err.message : "Unknown parsing error";
+    const message = err instanceof Error ? err.message : "Unknown parsing error";
 
     if (
       message.includes("password") ||

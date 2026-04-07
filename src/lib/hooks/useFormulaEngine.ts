@@ -27,10 +27,7 @@ export function useFormulaEngine(sheet: ParsedSheet) {
    * starts from all cell rawValues, applies formula cachedResults as initial,
    * then overlays any user mutations.
    */
-  const buildCurrentValues = useCallback((): Record<
-    string,
-    number | string | null
-  > => {
+  const buildCurrentValues = useCallback((): Record<string, number | string | null> => {
     const values: Record<string, number | string | null> = {};
 
     for (const row of sheet.rows) {
@@ -114,11 +111,7 @@ export function useFormulaEngine(sheet: ParsedSheet) {
 
       // 3. Recompute all formulas (full pass because any formula referencing
       //    any deleted cell is affected)
-      const recomputed = await recomputeAll(
-        currentValues,
-        sheet.formulaMap,
-        deletedSet
-      );
+      const recomputed = await recomputeAll(currentValues, sheet.formulaMap, deletedSet);
 
       if (Object.keys(recomputed).length > 0) {
         batchUpdateCells(sheet.id, recomputed);
@@ -146,8 +139,7 @@ export function useFormulaEngine(sheet: ParsedSheet) {
       restoreRowStore(sheet.id, rowIndex, rowAddresses);
 
       // 2. Read FRESH store state immediately after the synchronous update
-      const freshMutCells =
-        useWorkbookStore.getState().mutations[sheet.id]?.cells ?? {};
+      const freshMutCells = useWorkbookStore.getState().mutations[sheet.id]?.cells ?? {};
 
       // 3. Build current values with fresh mutations overlaid
       const values: Record<string, number | string | null> = {};

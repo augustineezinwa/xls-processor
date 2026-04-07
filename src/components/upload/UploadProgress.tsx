@@ -20,9 +20,7 @@ export function UploadProgress() {
           <FileSpreadsheet className="w-8 h-8 text-white" />
         </div>
 
-        <h2 className="text-xl font-semibold text-slate-800 mb-2">
-          Processing your file
-        </h2>
+        <h2 className="text-xl font-semibold text-slate-800 mb-2">Processing your file</h2>
         <p className="text-slate-400 text-sm mb-8">
           Analysing structure, formulas, and dependencies…
         </p>
@@ -39,8 +37,8 @@ export function UploadProgress() {
                   isActive
                     ? "bg-blue-50 border border-blue-200"
                     : isDone
-                    ? "bg-green-50 border border-green-100"
-                    : "bg-white border border-slate-100 opacity-40"
+                      ? "bg-green-50 border border-green-100"
+                      : "bg-white border border-slate-100 opacity-40"
                 }`}
               >
                 {isActive ? (
@@ -52,11 +50,7 @@ export function UploadProgress() {
                 )}
                 <span
                   className={`text-sm font-medium ${
-                    isActive
-                      ? "text-blue-700"
-                      : isDone
-                      ? "text-green-700"
-                      : "text-slate-400"
+                    isActive ? "text-blue-700" : isDone ? "text-green-700" : "text-slate-400"
                   }`}
                 >
                   {step.label}

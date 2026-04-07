@@ -26,17 +26,13 @@ export function WorkbookViewer() {
           <FileSpreadsheet className="w-4 h-4 text-white" />
         </div>
         <div>
-          <h1 className="text-sm font-semibold text-slate-800 leading-none">
-            {workbook.filename}
-          </h1>
+          <h1 className="text-sm font-semibold text-slate-800 leading-none">{workbook.filename}</h1>
           <p className="text-xs text-slate-400 mt-0.5">
             {workbook.sheets.length} sheet
-            {workbook.sheets.length !== 1 ? "s" : ""} ·{" "}
-            {activeSheet.dataRowCount} item
+            {workbook.sheets.length !== 1 ? "s" : ""} · {activeSheet.dataRowCount} item
             {activeSheet.dataRowCount !== 1 ? "s" : ""} ·{" "}
             {Object.keys(activeSheet.formulaMap).length} formula
-            {Object.keys(activeSheet.formulaMap).length !== 1 ? "s" : ""}{" "}
-            detected
+            {Object.keys(activeSheet.formulaMap).length !== 1 ? "s" : ""} detected
           </p>
         </div>
 

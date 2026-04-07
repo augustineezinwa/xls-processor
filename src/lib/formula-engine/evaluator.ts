@@ -180,9 +180,7 @@ export async function recomputeAll(
 
   // Process formulas in topological order (leaves first, roots last)
   // Sort by depth descending (deepest = highest depth number = process first)
-  const sortedFormulas = Object.values(formulaMap).sort(
-    (a, b) => b.depth - a.depth
-  );
+  const sortedFormulas = Object.values(formulaMap).sort((a, b) => b.depth - a.depth);
 
   const recomputed: Record<string, number | string | null> = {};
 

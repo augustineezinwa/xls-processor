@@ -33,10 +33,10 @@ export function buildFormulaGraph(formulaCells: RawFormulaCell[]): {
       address,
       formulaString,
       dependencies: deps,
-      dependents: [],     // filled below
-      depth: -1,          // filled during BFS
+      dependents: [], // filled below
+      depth: -1, // filled during BFS
       computationAxis: axis,
-      isRoot: false,      // filled below
+      isRoot: false, // filled below
     };
 
     // Register reverse edges

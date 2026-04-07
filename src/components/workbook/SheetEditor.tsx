@@ -45,8 +45,7 @@ export function SheetEditor({ sheet }: SheetEditorProps) {
     // results that haven't been overridden in the mutation store yet.
     const hasUnresolved = Object.values(sheet.formulaMap).some((entry) => {
       return (
-        (values[entry.address] === null ||
-          values[entry.address] === undefined) &&
+        (values[entry.address] === null || values[entry.address] === undefined) &&
         !(entry.address in mutationCells)
       );
     });

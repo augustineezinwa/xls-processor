@@ -29,11 +29,11 @@ const ROW_STYLES: Record<
     fontStyle: "bold" | "italic" | "normal";
   }
 > = {
-  header:  { fill: [30, 41, 59],    text: [255, 255, 255], fontStyle: "bold"   }, // slate-800 / white
+  header: { fill: [30, 41, 59], text: [255, 255, 255], fontStyle: "bold" }, // slate-800 / white
   section: { fill: [241, 245, 249], text: [100, 116, 139], fontStyle: "italic" }, // slate-100 / slate-500
-  subtotal:{ fill: [255, 251, 235], text: [30, 41, 59],    fontStyle: "bold"   }, // amber-50  / slate-800
-  total:   { fill: [239, 246, 255], text: [30, 41, 59],    fontStyle: "bold"   }, // blue-50   / slate-800
-  data:    { fill: [255, 255, 255], text: [30, 41, 59],    fontStyle: "normal" }, // white     / slate-800
+  subtotal: { fill: [255, 251, 235], text: [30, 41, 59], fontStyle: "bold" }, // amber-50  / slate-800
+  total: { fill: [239, 246, 255], text: [30, 41, 59], fontStyle: "bold" }, // blue-50   / slate-800
+  data: { fill: [255, 255, 255], text: [30, 41, 59], fontStyle: "normal" }, // white     / slate-800
   unknown: { fill: [255, 255, 255], text: [148, 163, 184], fontStyle: "normal" }, // white     / slate-400
 };
 
@@ -79,7 +79,7 @@ export function exportSheetToPDF(
   filename: string
 ): void {
   const cellOverrides = mutation?.cells ?? {};
-  const deletedRows   = mutation?.deletedRowIndices ?? new Set<number>();
+  const deletedRows = mutation?.deletedRowIndices ?? new Set<number>();
 
   // ── Build jspdf-autotable body ──────────────────────────────────────────
   type CellDef = {
@@ -131,10 +131,11 @@ export function exportSheetToPDF(
       const halign = getHAlign(colDef?.semanticType);
 
       // Per-cell bold/italic overrides from Excel formatting
-      const fontStyle: "bold" | "italic" | "normal" =
-        cell.isBold   ? "bold"
-        : cell.isItalic ? "italic"
-        : rowStyle.fontStyle;
+      const fontStyle: "bold" | "italic" | "normal" = cell.isBold
+        ? "bold"
+        : cell.isItalic
+          ? "italic"
+          : rowStyle.fontStyle;
 
       cells.push({
         content,
@@ -144,7 +145,7 @@ export function exportSheetToPDF(
           textColor: rowStyle.text,
           fontStyle,
           halign,
-          lineWidth:  0.1,
+          lineWidth: 0.1,
           lineColor: [226, 232, 240], // slate-200
         },
       });
@@ -159,14 +160,11 @@ export function exportSheetToPDF(
   // Portrait A4:  210 mm total − 40 mm margins = 170 mm available
   // Landscape A4: 297 mm total − 40 mm margins = 257 mm available
   const useLandscape = sheet.columns.length >= 7;
-  const orientation  = (useLandscape ? "landscape" : "portrait") as "landscape" | "portrait";
+  const orientation = (useLandscape ? "landscape" : "portrait") as "landscape" | "portrait";
   const AVAILABLE_WIDTH_MM = useLandscape ? 257 : 170;
 
   // ── Proportional column widths ──────────────────────────────────────────
-  const totalCharWidth = sheet.columns.reduce(
-    (sum, c) => sum + Math.max(c.width ?? 8, 8),
-    0
-  );
+  const totalCharWidth = sheet.columns.reduce((sum, c) => sum + Math.max(c.width ?? 8, 8), 0);
   const columnStyles: Record<number, { cellWidth: number }> = {};
   sheet.columns.forEach((col, i) => {
     const proportion = Math.max(col.width ?? 8, 8) / totalCharWidth;
@@ -179,7 +177,9 @@ export function exportSheetToPDF(
   // Document title header
   const strippedName = filename.replace(/\.(xlsx|xls|xlsm|csv)$/i, "");
   const now = new Date().toLocaleDateString(undefined, {
-    year: "numeric", month: "short", day: "numeric",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
   });
 
   doc.setFont("helvetica", "bold");
@@ -199,16 +199,14 @@ export function exportSheetToPDF(
   // ── Render table ────────────────────────────────────────────────────────
   // Provide a hidden head row so jspdf-autotable knows the column count
   // before encountering the first body row (which may have colSpan).
-  const hiddenHead: string[][] = [
-    Array.from({ length: sheet.columnCount }, () => ""),
-  ];
+  const hiddenHead: string[][] = [Array.from({ length: sheet.columnCount }, () => "")];
 
   autoTable(doc, {
     head: hiddenHead,
-    showHead: "never",          // hide the placeholder head row
+    showHead: "never", // hide the placeholder head row
     body: tableBody as unknown as string[][],
     startY: 30,
-    theme: "plain",             // we control all styles per-cell
+    theme: "plain", // we control all styles per-cell
     styles: {
       fontSize: 8.5,
       cellPadding: { top: 3, bottom: 3, left: 4, right: 4 },

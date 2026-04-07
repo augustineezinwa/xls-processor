@@ -12,13 +12,7 @@
 
 import ExcelJS from "exceljs";
 import { randomUUID } from "crypto";
-import type {
-  ParsedWorkbook,
-  ParsedSheet,
-  ParsedRow,
-  ParsedCell,
-  ComputationAxis,
-} from "@/types";
+import type { ParsedWorkbook, ParsedSheet, ParsedRow, ParsedCell, ComputationAxis } from "@/types";
 import { buildFormulaGraph, getAllTreeAddresses } from "./formula-extractor";
 import { parseMergeRegions, buildMergeLookup } from "./merged-cell-handler";
 import { classifyRows } from "./row-classifier";
@@ -27,9 +21,7 @@ import { colIndexToLetter, detectComputationAxis } from "./cell-address";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function resolveRawValue(
-  cell: ExcelJS.Cell
-): string | number | boolean | null {
+function resolveRawValue(cell: ExcelJS.Cell): string | number | boolean | null {
   const v = cell.value;
   if (v === null || v === undefined) return null;
 
@@ -46,9 +38,7 @@ function resolveRawValue(
 
     // Rich text — join all runs into plain string
     if ("richText" in v) {
-      return (v as ExcelJS.CellRichTextValue).richText
-        .map((r) => r.text)
-        .join("");
+      return (v as ExcelJS.CellRichTextValue).richText.map((r) => r.text).join("");
     }
 
     // Hyperlink — use display text
@@ -93,8 +83,7 @@ function resolveFormulaString(cell: ExcelJS.Cell): string | null {
   const v = cell.value;
   if (!v || typeof v !== "object") return null;
   if ("formula" in v) return `=${(v as ExcelJS.CellFormulaValue).formula}`;
-  if ("sharedFormula" in v)
-    return `=${(v as ExcelJS.CellSharedFormulaValue).sharedFormula}`;
+  if ("sharedFormula" in v) return `=${(v as ExcelJS.CellSharedFormulaValue).sharedFormula}`;
   return null;
 }
 
@@ -107,9 +96,7 @@ function formatDisplayValue(rawValue: string | number | boolean | null): string 
   return String(rawValue);
 }
 
-function getArgbHex(
-  color: Partial<ExcelJS.Color> | undefined
-): string | null {
+function getArgbHex(color: Partial<ExcelJS.Color> | undefined): string | null {
   if (!color) return null;
   const argb = color.argb;
   if (!argb || argb === "FF000000" || argb === "FFFFFFFF") return null;
@@ -142,10 +129,7 @@ export async function parseWorkbook(
   };
 }
 
-function parseSheet(
-  ws: ExcelJS.Worksheet,
-  sheetIndex: number
-): ParsedSheet | null {
+function parseSheet(ws: ExcelJS.Worksheet, sheetIndex: number): ParsedSheet | null {
   // ── Phase 1: Determine used range ─────────────────────────────────────────
   const rowCount = ws.rowCount;
   const colCount = ws.columnCount;
@@ -223,8 +207,7 @@ function parseSheet(
   const effectiveColCount = Math.max(maxColUsed, 1);
 
   // ── Phase 4: Extract formula cells & build dependency graph ──────────────
-  const formulaCellInputs: Array<{ address: string; formulaString: string }> =
-    [];
+  const formulaCellInputs: Array<{ address: string; formulaString: string }> = [];
 
   for (const row of rawRows) {
     for (const cellData of row.cells.values()) {
@@ -258,9 +241,7 @@ function parseSheet(
   // Use the LAST header-classified row before the first data row.
   // This correctly handles sheets where a merged title row precedes the
   // actual column-header row (e.g. "PROJECT ALPHA" above "#, Description, Qty…").
-  const allHeaderIndices = rowTypes
-    .map((t, i) => (t === "header" ? i : -1))
-    .filter((i) => i >= 0);
+  const allHeaderIndices = rowTypes.map((t, i) => (t === "header" ? i : -1)).filter((i) => i >= 0);
 
   const firstDataIndex = rowTypes.findIndex(
     (t) => t === "data" || t === "subtotal" || t === "total"
@@ -275,10 +256,7 @@ function parseSheet(
     }
   }
 
-  const headerRowNumber =
-    headerRowArrayIndex >= 0
-      ? rawRows[headerRowArrayIndex].rowNumber
-      : null;
+  const headerRowNumber = headerRowArrayIndex >= 0 ? rawRows[headerRowArrayIndex].rowNumber : null;
 
   // ── Phase 7: Build column header texts ───────────────────────────────────
   const columnHeaders: Map<number, string> = new Map(); // colIndex(1-based) → text
@@ -287,8 +265,11 @@ function parseSheet(
     if (hRow) {
       // Only use cells that are NOT merge-children (avoid duplicating merged titles)
       for (const [colNum, cell] of hRow.cells.entries()) {
-        if (cell.address && mergeLookup.get(cell.address)?.originAddress !== cell.address
-          && mergeLookup.has(cell.address)) {
+        if (
+          cell.address &&
+          mergeLookup.get(cell.address)?.originAddress !== cell.address &&
+          mergeLookup.has(cell.address)
+        ) {
           // merge child — skip
           continue;
         }
@@ -372,65 +353,56 @@ function parseSheet(
   const parsedRows: ParsedRow[] = rawRows.map((row, ri) => {
     const rowType = rowTypes[ri];
     const isEditable =
-      rowType === "data" ||
-      rowType === "subtotal" ||
-      rowType === "total" ||
-      rowType === "unknown";
+      rowType === "data" || rowType === "subtotal" || rowType === "total" || rowType === "unknown";
 
     if (rowType === "data") dataRowCount++;
 
-    const cells: ParsedCell[] = Array.from(
-      { length: effectiveColCount },
-      (_, ci) => {
-        const colNum = ci + 1;
-        const addr = `${colIndexToLetter(colNum)}${row.rowNumber}`;
-        const cellData = row.cells.get(colNum);
+    const cells: ParsedCell[] = Array.from({ length: effectiveColCount }, (_, ci) => {
+      const colNum = ci + 1;
+      const addr = `${colIndexToLetter(colNum)}${row.rowNumber}`;
+      const cellData = row.cells.get(colNum);
 
-        const mergeInfo = mergeLookup.get(addr);
-        const isMergeOrigin = mergeInfo?.originAddress === addr;
-        const isMergeChild =
-          !!mergeInfo && mergeInfo.originAddress !== addr;
+      const mergeInfo = mergeLookup.get(addr);
+      const isMergeOrigin = mergeInfo?.originAddress === addr;
+      const isMergeChild = !!mergeInfo && mergeInfo.originAddress !== addr;
 
-        const rawValue = cellData?.rawValue ?? null;
-        const formulaString = cellData?.formulaString ?? null;
-        const formulaEntry = formulaString ? formulaMap[addr] : null;
+      const rawValue = cellData?.rawValue ?? null;
+      const formulaString = cellData?.formulaString ?? null;
+      const formulaEntry = formulaString ? formulaMap[addr] : null;
 
-        let treeDepth: number | null = null;
-        let computationAxis: ComputationAxis = "none";
-        if (formulaEntry) {
-          treeDepth = formulaEntry.depth;
-          computationAxis = formulaEntry.computationAxis;
-        } else if (treeAddresses.has(addr) && !formulaString) {
-          // This cell is a dependency (leaf) but has no formula
-          treeDepth = null;
-          computationAxis = "none";
-        }
-
-        return {
-          address: addr,
-          rawValue,
-          displayValue: formatDisplayValue(
-            formulaString ? (cellData?.cachedResult ?? rawValue) : rawValue
-          ),
-          formulaString,
-          cachedResult: cellData?.cachedResult ?? null,
-          isBold: cellData?.isBold ?? false,
-          isItalic: cellData?.isItalic ?? false,
-          backgroundColor: cellData?.backgroundColor ?? null,
-          fontColor: cellData?.fontColor ?? null,
-          numberFormat: cellData?.numberFormat ?? null,
-          colSpan: isMergeOrigin ? (mergeInfo?.colSpan ?? 1) : 1,
-          rowSpan: isMergeOrigin ? (mergeInfo?.rowSpan ?? 1) : 1,
-          isMergeOrigin,
-          isMergeChild,
-          mergeOriginAddress: isMergeChild
-            ? (mergeInfo?.originAddress ?? null)
-            : null,
-          treeDepth,
-          computationAxis,
-        } satisfies ParsedCell;
+      let treeDepth: number | null = null;
+      let computationAxis: ComputationAxis = "none";
+      if (formulaEntry) {
+        treeDepth = formulaEntry.depth;
+        computationAxis = formulaEntry.computationAxis;
+      } else if (treeAddresses.has(addr) && !formulaString) {
+        // This cell is a dependency (leaf) but has no formula
+        treeDepth = null;
+        computationAxis = "none";
       }
-    );
+
+      return {
+        address: addr,
+        rawValue,
+        displayValue: formatDisplayValue(
+          formulaString ? (cellData?.cachedResult ?? rawValue) : rawValue
+        ),
+        formulaString,
+        cachedResult: cellData?.cachedResult ?? null,
+        isBold: cellData?.isBold ?? false,
+        isItalic: cellData?.isItalic ?? false,
+        backgroundColor: cellData?.backgroundColor ?? null,
+        fontColor: cellData?.fontColor ?? null,
+        numberFormat: cellData?.numberFormat ?? null,
+        colSpan: isMergeOrigin ? (mergeInfo?.colSpan ?? 1) : 1,
+        rowSpan: isMergeOrigin ? (mergeInfo?.rowSpan ?? 1) : 1,
+        isMergeOrigin,
+        isMergeChild,
+        mergeOriginAddress: isMergeChild ? (mergeInfo?.originAddress ?? null) : null,
+        treeDepth,
+        computationAxis,
+      } satisfies ParsedCell;
+    });
 
     return {
       index: ri,

@@ -27,9 +27,7 @@ export function RowActions({ rowType, isDeleted, onDelete, onRestore }: RowActio
     <td className="w-20 px-1 py-1 border border-slate-200 bg-slate-50/80">
       <div className="flex items-center gap-1 justify-center">
         {/* Row type badge */}
-        <span
-          className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${badge.color}`}
-        >
+        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${badge.color}`}>
           {badge.label}
         </span>
 

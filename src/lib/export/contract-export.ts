@@ -18,36 +18,46 @@ import { formatCellValue } from "@/lib/utils/number-format";
 
 // ─── Shared colour palette (Tailwind → RGB) ───────────────────────────────────
 const C = {
-  slate800: [30, 41, 59]   as [number, number, number],
-  slate600: [71, 85, 105]  as [number, number, number],
-  slate500: [100, 116, 139]as [number, number, number],
-  slate200: [226, 232, 240]as [number, number, number],
-  gray400:  [156, 163, 175]as [number, number, number],
-  white:    [255, 255, 255]as [number, number, number],
-  amber50:  [255, 251, 235]as [number, number, number],
-  blue50:   [239, 246, 255]as [number, number, number],
-  slate100: [241, 245, 249]as [number, number, number],
+  slate800: [30, 41, 59] as [number, number, number],
+  slate600: [71, 85, 105] as [number, number, number],
+  slate500: [100, 116, 139] as [number, number, number],
+  slate200: [226, 232, 240] as [number, number, number],
+  gray400: [156, 163, 175] as [number, number, number],
+  white: [255, 255, 255] as [number, number, number],
+  amber50: [255, 251, 235] as [number, number, number],
+  blue50: [239, 246, 255] as [number, number, number],
+  slate100: [241, 245, 249] as [number, number, number],
 };
 
 // ─── Row-type → PDF cell style ────────────────────────────────────────────────
 const ROW_STYLES: Record<
   string,
-  { fill: [number,number,number]; text: [number,number,number]; fontStyle: "bold"|"italic"|"normal" }
+  {
+    fill: [number, number, number];
+    text: [number, number, number];
+    fontStyle: "bold" | "italic" | "normal";
+  }
 > = {
-  header:   { fill: [30, 41, 59],    text: [255,255,255], fontStyle: "bold"   },
-  section:  { fill: [241, 245, 249], text: [100,116,139], fontStyle: "italic" },
-  subtotal: { fill: [255, 251, 235], text: [30, 41, 59],  fontStyle: "bold"   },
-  total:    { fill: [239, 246, 255], text: [30, 41, 59],  fontStyle: "bold"   },
-  data:     { fill: [255, 255, 255], text: [30, 41, 59],  fontStyle: "normal" },
-  unknown:  { fill: [255, 255, 255], text: [148,163,184], fontStyle: "normal" },
+  header: { fill: [30, 41, 59], text: [255, 255, 255], fontStyle: "bold" },
+  section: { fill: [241, 245, 249], text: [100, 116, 139], fontStyle: "italic" },
+  subtotal: { fill: [255, 251, 235], text: [30, 41, 59], fontStyle: "bold" },
+  total: { fill: [239, 246, 255], text: [30, 41, 59], fontStyle: "bold" },
+  data: { fill: [255, 255, 255], text: [30, 41, 59], fontStyle: "normal" },
+  unknown: { fill: [255, 255, 255], text: [148, 163, 184], fontStyle: "normal" },
 };
 
 type HAlign = "left" | "center" | "right";
 function getHAlign(semanticType: string | undefined): HAlign {
   switch (semanticType) {
-    case "quantity": case "unit_price": case "amount": case "percentage": return "right";
-    case "identifier": return "center";
-    default: return "left";
+    case "quantity":
+    case "unit_price":
+    case "amount":
+    case "percentage":
+      return "right";
+    case "identifier":
+      return "center";
+    default:
+      return "left";
   }
 }
 
@@ -84,7 +94,7 @@ export interface ContractExportParams {
   mutation: SheetMutation | null;
   partyA: string;
   partyB: string;
-  agreementDate: string;  // "YYYY-MM-DD"
+  agreementDate: string; // "YYYY-MM-DD"
   contractBody: string;
 }
 
@@ -97,20 +107,20 @@ export function exportContractToPDF({
   contractBody,
 }: ContractExportParams): void {
   const cellOverrides = mutation?.cells ?? {};
-  const deletedRows   = mutation?.deletedRowIndices ?? new Set<number>();
+  const deletedRows = mutation?.deletedRowIndices ?? new Set<number>();
 
   // ── Orientation: landscape when the sheet has ≥7 columns ─────────────────
-  const useLandscape   = sheet.columns.length >= 7;
-  const orientation    = (useLandscape ? "landscape" : "portrait") as "landscape" | "portrait";
+  const useLandscape = sheet.columns.length >= 7;
+  const orientation = (useLandscape ? "landscape" : "portrait") as "landscape" | "portrait";
   const doc = new jsPDF({ orientation, unit: "mm", format: "a4" });
 
   // Derived layout constants — all downstream positions use these
-  const pageWidth      = doc.internal.pageSize.getWidth();  // 210 portrait / 297 landscape
-  const centerX        = pageWidth / 2;                     // 105  / 148.5
-  const availableWidth = pageWidth - 40;                    // 170  / 257
+  const pageWidth = doc.internal.pageSize.getWidth(); // 210 portrait / 297 landscape
+  const centerX = pageWidth / 2; // 105  / 148.5
+  const availableWidth = pageWidth - 40; // 170  / 257
   // Right signature block starts just past centre; underline fills each half
-  const rightSigX  = Math.round(centerX) + 7;              // 112  / 156
-  const sigLineLen = Math.round(availableWidth / 2) - 24;  // 61   / 104
+  const rightSigX = Math.round(centerX) + 7; // 112  / 156
+  const sigLineLen = Math.round(availableWidth / 2) - 24; // 61   / 104
 
   // ── 1. Header ──────────────────────────────────────────────────────────────
   doc.setFont("helvetica", "bold");
@@ -126,7 +136,9 @@ export function exportContractToPDF({
   // Date of agreement
   const formattedDate = agreementDate
     ? new Date(agreementDate + "T00:00:00").toLocaleDateString(undefined, {
-        year: "numeric", month: "long", day: "numeric",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
       })
     : "________________";
 
@@ -170,12 +182,12 @@ export function exportContractToPDF({
     content: string;
     colSpan?: number;
     styles: {
-      fillColor: [number,number,number];
-      textColor: [number,number,number];
-      fontStyle: "bold"|"italic"|"normal";
+      fillColor: [number, number, number];
+      textColor: [number, number, number];
+      fontStyle: "bold" | "italic" | "normal";
       halign: HAlign;
       lineWidth: number;
-      lineColor: [number,number,number];
+      lineColor: [number, number, number];
     };
   };
 
@@ -195,14 +207,17 @@ export function exportContractToPDF({
         content = String(cell.rawValue ?? cell.displayValue ?? "");
       } else {
         const live = resolveCellValue(
-          cell.address, cell.rawValue, cell.cachedResult,
-          cell.formulaString, cellOverrides
+          cell.address,
+          cell.rawValue,
+          cell.cachedResult,
+          cell.formulaString,
+          cellOverrides
         );
         content = formatCellValue(live, cell.numberFormat, live as number, null);
       }
 
       const colLetter = cell.address.match(/[A-Z]+/)?.[0] ?? "";
-      const colDef    = sheet.columns.find(c => c.letter === colLetter);
+      const colDef = sheet.columns.find((c) => c.letter === colLetter);
 
       cells.push({
         content,
@@ -224,7 +239,9 @@ export function exportContractToPDF({
   const totalCharW = sheet.columns.reduce((s, c) => s + Math.max(c.width ?? 8, 8), 0);
   const colStyles: Record<number, { cellWidth: number }> = {};
   sheet.columns.forEach((col, i) => {
-    colStyles[i] = { cellWidth: Math.round((Math.max(col.width ?? 8, 8) / totalCharW) * availableWidth * 10) / 10 };
+    colStyles[i] = {
+      cellWidth: Math.round((Math.max(col.width ?? 8, 8) / totalCharW) * availableWidth * 10) / 10,
+    };
   });
 
   // Hidden head row to fix column count (same technique as pdf-export.ts)
@@ -236,7 +253,11 @@ export function exportContractToPDF({
     body: tableBody as unknown as string[][],
     startY: y,
     theme: "plain",
-    styles: { fontSize: 8, cellPadding: { top: 2.5, bottom: 2.5, left: 3.5, right: 3.5 }, overflow: "linebreak" },
+    styles: {
+      fontSize: 8,
+      cellPadding: { top: 2.5, bottom: 2.5, left: 3.5, right: 3.5 },
+      overflow: "linebreak",
+    },
     columnStyles: colStyles,
     margin: { left: 20, right: 20 },
   });
@@ -248,7 +269,10 @@ export function exportContractToPDF({
   // Auto-add page if needed
   const pageH = doc.internal.pageSize.getHeight();
   const checkY = (needed: number) => {
-    if (y + needed > pageH - 20) { doc.addPage(); y = 20; }
+    if (y + needed > pageH - 20) {
+      doc.addPage();
+      y = 20;
+    }
   };
 
   checkY(20);
@@ -277,8 +301,8 @@ export function exportContractToPDF({
   y += 7;
 
   const sigBlocks: Array<{ x: number; label: string }> = [
-    { x: 20,       label: "Supplier / Provider" },
-    { x: rightSigX, label: "Client / Buyer"     },
+    { x: 20, label: "Supplier / Provider" },
+    { x: rightSigX, label: "Client / Buyer" },
   ];
 
   const sigLines = ["Name", "Signature", "Date"];
@@ -309,16 +333,16 @@ export function exportContractToPDF({
   }
 
   // ── Footer ─────────────────────────────────────────────────────────────────
-  const totalPages = (doc.internal as { getNumberOfPages?: () => number }).getNumberOfPages?.() ?? 1;
+  const totalPages =
+    (doc.internal as { getNumberOfPages?: () => number }).getNumberOfPages?.() ?? 1;
   for (let p = 1; p <= totalPages; p++) {
     doc.setPage(p);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(7);
     doc.setTextColor(...C.gray400);
-    doc.text(
-      `Page ${p} of ${totalPages}  ·  contract-agreement`,
-      centerX, pageH - 8, { align: "center" }
-    );
+    doc.text(`Page ${p} of ${totalPages}  ·  contract-agreement`, centerX, pageH - 8, {
+      align: "center",
+    });
   }
 
   doc.save("contract-agreement.pdf");

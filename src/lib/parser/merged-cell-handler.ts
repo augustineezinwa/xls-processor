@@ -12,9 +12,7 @@ export interface MergeRegion {
  * Parse ExcelJS merged cell range strings (e.g. "A1:C3") into MergeRegion objects.
  * ExcelJS returns merges as an array of strings or as a model object.
  */
-export function parseMergeRegions(
-  merges: string[]
-): Map<string, MergeRegion> {
+export function parseMergeRegions(merges: string[]): Map<string, MergeRegion> {
   const regionMap = new Map<string, MergeRegion>(); // key = originAddress
 
   for (const mergeStr of merges) {
@@ -58,9 +56,7 @@ export function parseMergeRegions(
 /**
  * Build a lookup from any cell address → its merge region (if any).
  */
-export function buildMergeLookup(
-  regionMap: Map<string, MergeRegion>
-): Map<string, MergeRegion> {
+export function buildMergeLookup(regionMap: Map<string, MergeRegion>): Map<string, MergeRegion> {
   const lookup = new Map<string, MergeRegion>();
   for (const region of regionMap.values()) {
     for (const addr of region.coveredAddresses) {

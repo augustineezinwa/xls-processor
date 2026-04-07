@@ -28,11 +28,7 @@ interface RawRow {
  *  6. section       → text-only row NOT before data rows (group label)
  *  7. unknown       → fallback
  */
-export function classifyRows(
-  rows: RawRow[],
-  formulaMap: FormulaMap,
-  totalRows: number
-): RowType[] {
+export function classifyRows(rows: RawRow[], formulaMap: FormulaMap, totalRows: number): RowType[] {
   const types: RowType[] = new Array(rows.length).fill("unknown" as RowType);
 
   // Build a lookup: address → formula entry
@@ -157,10 +153,7 @@ export function classifyRows(
     if (types[i] === "unknown") {
       const prev = types[i - 1];
       const next = types[i + 1];
-      if (
-        (prev === "data" || prev === "subtotal") &&
-        (next === "data" || next === "subtotal")
-      ) {
+      if ((prev === "data" || prev === "subtotal") && (next === "data" || next === "subtotal")) {
         types[i] = "data";
       }
     }

@@ -40,8 +40,7 @@ function EditableCellInner({
   const startEdit = useCallback(() => {
     if (!isEditable) return;
     // Show raw value in edit mode, not formatted
-    const raw =
-      currentValue === null ? "" : String(currentValue);
+    const raw = currentValue === null ? "" : String(currentValue);
     setEditBuffer(raw);
     setIsEditing(true);
   }, [isEditable, currentValue]);
