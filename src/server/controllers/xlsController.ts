@@ -38,12 +38,9 @@ export async function xlsController(c: Context<{ Variables: AppVariables }>) {
     }
 
     const message = err instanceof Error ? err.message : "Unknown parsing error";
+    const isCorruptedOrProtected = message.includes("password") || message.includes("encrypted") || message.includes("corrupt");
 
-    if (
-      message.includes("password") ||
-      message.includes("encrypted") ||
-      message.includes("corrupt")
-    ) {
+    if (isCorruptedOrProtected) {
       return c.json(
         {
           success: false,
