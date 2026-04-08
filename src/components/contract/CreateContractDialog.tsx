@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useMemo, memo } from "react";
 import { X, Printer } from "lucide-react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import type { ParsedSheet, SheetMutation } from "@/types";
 import { formatCellValue } from "@/lib/utils/number-format";
 import { exportContractToPDF } from "@/lib/export/contract-export";
@@ -77,6 +78,113 @@ function colAlign(semanticType: string | undefined): HAlign {
   }
 }
 
+// ─── Stable fallback so useMemo deps don't change on every render ─────────────
+const EMPTY_DELETED = new Set<number>();
+
+// ─── Schedule of Works table ──────────────────────────────────────────────────
+// Extracted as a memoised component so that typing in the form fields (Party A,
+// Party B, date, contract body) does NOT trigger a re-render of the table.
+// Pairs with useVirtualizer so only ~20 rows are in the DOM at once regardless
+// of sheet size, eliminating both the typing lag and the initial-render cost.
+const ScheduleTable = memo(function ScheduleTable({
+  sheet,
+  mutation,
+}: {
+  sheet: ParsedSheet;
+  mutation: SheetMutation | null;
+}) {
+  const parentRef = useRef<HTMLDivElement>(null);
+  const cellOverrides = mutation?.cells ?? {};
+
+  // O(1) column lookup — avoids Array.find on every cell render
+  const colMap = useMemo(() => new Map(sheet.columns.map((c) => [c.letter, c])), [sheet.columns]);
+
+  // Filtered rows — recomputed only when sheet or mutation changes
+  const filteredRows = useMemo(() => {
+    const deleted = mutation?.deletedRowIndices ?? EMPTY_DELETED;
+    return sheet.rows.filter((r) => r.type !== "blank" && !deleted.has(r.index));
+  }, [sheet.rows, mutation]);
+
+  // Virtualizer — identical pattern to SpreadsheetTable
+  const rowVirtualizer = useVirtualizer({
+    count: filteredRows.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 36,
+    overscan: 10,
+  });
+
+  const virtualItems = rowVirtualizer.getVirtualItems();
+  const totalSize = rowVirtualizer.getTotalSize();
+  const paddingTop = virtualItems.length > 0 ? virtualItems[0].start : 0;
+  const paddingBottom =
+    virtualItems.length > 0 ? totalSize - virtualItems[virtualItems.length - 1].end : 0;
+
+  return (
+    <div
+      ref={parentRef}
+      className="rounded-xl border border-slate-200 overflow-auto mb-2"
+      style={{ maxHeight: "40vh" }}
+    >
+      <table className="w-full border-collapse text-sm">
+        <tbody>
+          {paddingTop > 0 && (
+            <tr>
+              <td style={{ height: paddingTop, padding: 0 }} />
+            </tr>
+          )}
+
+          {virtualItems.map((vRow) => {
+            const row = filteredRows[vRow.index];
+            const rowClass = ROW_CLASS[row.type] ?? ROW_CLASS.data;
+            return (
+              <tr key={row.index} className={`${rowClass} border-b border-slate-100 last:border-0`}>
+                {row.cells.map((cell) => {
+                  if (cell.isMergeChild) return null;
+
+                  const live = resolveLiveValue(
+                    cell.address,
+                    cell.rawValue,
+                    cell.cachedResult,
+                    cell.formulaString,
+                    cellOverrides
+                  );
+                  const display =
+                    row.type === "header"
+                      ? String(cell.rawValue ?? cell.displayValue ?? "")
+                      : formatCellValue(live, cell.numberFormat, live as number, null);
+
+                  const colLetter = cell.address.match(/[A-Z]+/)?.[0] ?? "";
+                  const align = colAlign(colMap.get(colLetter)?.semanticType);
+
+                  return (
+                    <td
+                      key={cell.address}
+                      colSpan={cell.colSpan > 1 ? cell.colSpan : undefined}
+                      className={`px-3 py-2 text-${align}`}
+                      style={{
+                        fontWeight: cell.isBold ? "bold" : undefined,
+                        fontStyle: cell.isItalic ? "italic" : undefined,
+                      }}
+                    >
+                      {display}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+
+          {paddingBottom > 0 && (
+            <tr>
+              <td style={{ height: paddingBottom, padding: 0 }} />
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+});
+
 // ─── Signature block ──────────────────────────────────────────────────────────
 function SignatureBlock({ label }: { label: string }) {
   return (
@@ -118,9 +226,6 @@ export function CreateContractDialog({
   const [partyB, setPartyB] = useState("");
   const [agreementDate, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [contractBody, setBody] = useState(DEFAULT_CONTRACT_TEXT);
-
-  const cellOverrides = mutation?.cells ?? {};
-  const deletedRows = mutation?.deletedRowIndices ?? new Set<number>();
 
   const handlePrint = () => {
     exportContractToPDF({ sheet, mutation, partyA, partyB, agreementDate, contractBody });
@@ -217,57 +322,8 @@ export function CreateContractDialog({
           {/* ── Schedule of Works ── */}
           <SectionHeading>Schedule of Works</SectionHeading>
 
-          <div className="rounded-xl border border-slate-200 overflow-hidden mb-2">
-            <table className="w-full border-collapse text-sm">
-              <tbody>
-                {sheet.rows
-                  .filter((row) => row.type !== "blank" && !deletedRows.has(row.index))
-                  .map((row) => {
-                    const rowClass = ROW_CLASS[row.type] ?? ROW_CLASS.data;
-                    return (
-                      <tr
-                        key={row.index}
-                        className={`${rowClass} border-b border-slate-100 last:border-0`}
-                      >
-                        {row.cells.map((cell) => {
-                          if (cell.isMergeChild) return null;
-
-                          const live = resolveLiveValue(
-                            cell.address,
-                            cell.rawValue,
-                            cell.cachedResult,
-                            cell.formulaString,
-                            cellOverrides
-                          );
-                          const display =
-                            row.type === "header"
-                              ? String(cell.rawValue ?? cell.displayValue ?? "")
-                              : formatCellValue(live, cell.numberFormat, live as number, null);
-
-                          const colLetter = cell.address.match(/[A-Z]+/)?.[0] ?? "";
-                          const colDef = sheet.columns.find((c) => c.letter === colLetter);
-                          const align = colAlign(colDef?.semanticType);
-
-                          return (
-                            <td
-                              key={cell.address}
-                              colSpan={cell.colSpan > 1 ? cell.colSpan : undefined}
-                              className={`px-3 py-2 text-${align}`}
-                              style={{
-                                fontWeight: cell.isBold ? "bold" : undefined,
-                                fontStyle: cell.isItalic ? "italic" : undefined,
-                              }}
-                            >
-                              {display}
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    );
-                  })}
-              </tbody>
-            </table>
-          </div>
+          {/* Memoised + virtualised — does not re-render when form fields change */}
+          <ScheduleTable sheet={sheet} mutation={mutation} />
 
           {/* ── Terms & Conditions ── */}
           <SectionHeading>Terms &amp; Conditions</SectionHeading>

@@ -69,7 +69,8 @@
       "Bash(npm run format)",
       "Bash(npm run format -- src/lib/parser/row-classifier.ts)",
       "Bash(npm run format -- src/components/table/SpreadsheetTable.tsx)",
-      "Bash(npm run format -- src/components/table/EditableCell.tsx)"
+      "Bash(npm run format -- src/components/table/EditableCell.tsx)",
+      "Bash(npm run format -- src/components/contract/CreateContractDialog.tsx)"
     ]
   }
 }
