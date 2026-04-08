@@ -7,10 +7,23 @@ import { useSheetMutation } from "@/lib/hooks/useWorkbook";
 import { useFormulaEngine } from "@/lib/hooks/useFormulaEngine";
 import { EditableCell } from "./EditableCell";
 import { RowActions } from "./RowActions";
+import { colAlign } from "@/lib/utils/colAlign";
+import { resolveLiveValue } from "@/lib/parser/resolveLiveValue";
 
 interface SpreadsheetTableProps {
   sheet: ParsedSheet;
 }
+
+// Row type → visual style
+const rowStyle: Record<string, string> = {
+  header: "bg-slate-800 text-white font-semibold text-xs uppercase tracking-wide",
+  data: "hover:bg-slate-50/80 transition-colors",
+  subtotal: "bg-amber-50/60 font-medium",
+  total: "bg-blue-50 font-bold border-t-2 border-blue-300",
+  section: "bg-slate-100 italic text-slate-500",
+  blank: "h-2",
+  unknown: "opacity-70",
+};
 
 export function SpreadsheetTable({ sheet }: SpreadsheetTableProps) {
   const mutation = useSheetMutation(sheet.id);
@@ -18,60 +31,6 @@ export function SpreadsheetTable({ sheet }: SpreadsheetTableProps) {
 
   const deletedRows = mutation?.deletedRowIndices ?? new Set<number>();
   const cellOverrides = mutation?.cells ?? {};
-
-  // Get the live value for a cell:
-  //   1. User mutation override (highest priority)
-  //   2. Cached formula result from parse (if present)
-  //   3. Raw value (plain data cells)
-  //   4. null (formula cell with no cached result — evaluator will fill it)
-  const getLiveValue = (
-    address: string,
-    rawValue: string | number | boolean | null,
-    cachedResult: string | number | null,
-    formulaString: string | null
-  ): string | number | null => {
-    // Mutation override always wins
-    if (address in cellOverrides) {
-      return cellOverrides[address];
-    }
-    // Formula cell with a cached result from Excel
-    if (formulaString !== null && cachedResult !== null) {
-      return cachedResult;
-    }
-    // Plain cell
-    if (formulaString === null) {
-      return rawValue as string | number | null;
-    }
-    // Formula cell with NO cached result (result was null in the file)
-    // Return null — the formula engine will compute it when triggered
-    return null;
-  };
-
-  // Row type → visual style
-  const rowStyle: Record<string, string> = {
-    header: "bg-slate-800 text-white font-semibold text-xs uppercase tracking-wide",
-    data: "hover:bg-slate-50/80 transition-colors",
-    subtotal: "bg-amber-50/60 font-medium",
-    total: "bg-blue-50 font-bold border-t-2 border-blue-300",
-    section: "bg-slate-100 italic text-slate-500",
-    blank: "h-2",
-    unknown: "opacity-70",
-  };
-
-  // Column alignment based on semantic type
-  const colAlign = (semanticType: string): string => {
-    switch (semanticType) {
-      case "quantity":
-      case "unit_price":
-      case "amount":
-      case "percentage":
-        return "text-right";
-      case "identifier":
-        return "text-center";
-      default:
-        return "text-left";
-    }
-  };
 
   // Build the full visibleRows list (with deleted status)
   const visibleRows = useMemo(
@@ -153,11 +112,12 @@ export function SpreadsheetTable({ sheet }: SpreadsheetTableProps) {
           // Skip merge children — the origin cell already has colSpan
           if (cell.isMergeChild) return null;
 
-          const liveValue = getLiveValue(
+          const liveValue = resolveLiveValue(
             cell.address,
             cell.rawValue,
             cell.cachedResult,
-            cell.formulaString
+            cell.formulaString,
+            cellOverrides
           );
 
           const colIdx = cell.address.match(/[A-Z]+/)?.[0] ?? "";

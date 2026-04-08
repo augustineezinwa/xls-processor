@@ -6,7 +6,7 @@
  */
 
 import type { FormulaMap, DependencyGraph } from "@/types";
-import { substituteRefs, expandRange } from "./refParser";
+import { substituteRefs } from "@/lib/formulaEngine/refParser";
 
 // Lazy-load formulajs to avoid SSR issues
 let formulajsCache: Record<string, (...args: unknown[]) => unknown> | null = null;
