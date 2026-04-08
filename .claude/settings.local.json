@@ -68,7 +68,8 @@
       "Bash(npm install --save-dev prettier)",
       "Bash(npm run format)",
       "Bash(npm run format -- src/lib/parser/row-classifier.ts)",
-      "Bash(npm run format -- src/components/table/SpreadsheetTable.tsx)"
+      "Bash(npm run format -- src/components/table/SpreadsheetTable.tsx)",
+      "Bash(npm run format -- src/components/table/EditableCell.tsx)"
     ]
   }
 }
