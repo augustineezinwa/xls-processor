@@ -1,5 +1,9 @@
 # XLS Quotes Processor 
 
+## View on -> [Live link](https://xls-processor.netlify.app/)
+
+## Architecture Workflow -> [View architecture workflow](./architecture_workflow.md)
+
 ## Getting Started
 
 First, run the development server:
