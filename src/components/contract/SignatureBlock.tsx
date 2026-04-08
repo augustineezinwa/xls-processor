@@ -1,4 +1,3 @@
-// ─── Signature block ──────────────────────────────────────────────────────────
 function SignatureBlock({ label }: { label: string }) {
     return (
         <div className="flex-1 min-w-0">

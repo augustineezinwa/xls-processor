@@ -1,4 +1,3 @@
-// ─── Section divider ──────────────────────────────────────────────────────────
 function SectionHeading({ children }: { children: React.ReactNode }) {
     return (
         <div className="flex items-center gap-3 my-6">

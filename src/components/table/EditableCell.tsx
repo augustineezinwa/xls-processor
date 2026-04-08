@@ -30,12 +30,12 @@ function EditableCellInner({
   const [editBuffer, setEditBuffer] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Displayed value
+
   const displayValue = formatCellValue(
     currentValue,
     cell.numberFormat,
     typeof currentValue === "number" ? currentValue : null,
-    null // don't pass formula string — we already have the live value
+    null // don't pass formula string — live value for formulas is already computed
   );
 
   const startEdit = useCallback(() => {

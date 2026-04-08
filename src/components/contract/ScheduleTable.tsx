@@ -4,7 +4,6 @@ import type { ParsedSheet, SheetMutation } from "@/types";
 import { formatCellValue } from "@/lib/utils/numberFormat";
 import { resolveLiveValue } from "@/lib/parser/resolveLiveValue";
 
-// ─── Row-type → Tailwind classes (mirrors SpreadsheetTable) ───────────────────
 const ROW_CLASS: Record<string, string> = {
     header: "bg-slate-800 text-white text-xs font-semibold tracking-wide",
     section: "bg-slate-100 text-slate-500 italic text-sm",

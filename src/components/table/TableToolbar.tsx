@@ -118,7 +118,6 @@ export function TableToolbar({ sheet }: TableToolbarProps) {
         </div>
       </div>
 
-      {/* Contract dialog — mounted outside the toolbar div so it can be full-screen */}
       {isContractOpen && (
         <CreateContractDialog
           sheet={sheet}
