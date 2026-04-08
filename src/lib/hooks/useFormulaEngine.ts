@@ -3,7 +3,7 @@
 import { useCallback, useRef } from "react";
 import type { ParsedSheet } from "@/types";
 import { useWorkbookStore } from "./useWorkbook";
-import { recomputeFromEdit, recomputeAll } from "@/lib/formula-engine";
+import { recomputeFromEdit, recomputeAll } from "@/lib/formulaEngine";
 
 /**
  * React hook that wraps the formula engine for a single sheet.

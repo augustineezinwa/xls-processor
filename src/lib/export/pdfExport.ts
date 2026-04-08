@@ -18,7 +18,7 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import type { ParsedSheet, SheetMutation } from "@/types";
-import { formatCellValue } from "@/lib/utils/number-format";
+import { formatCellValue } from "@/lib/utils/numberFormat";
 
 // ─── Row-type colors (Tailwind → RGB) ────────────────────────────────────────
 const ROW_STYLES: Record<

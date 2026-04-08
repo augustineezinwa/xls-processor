@@ -1,4 +1,4 @@
-import { colLetterToIndex, colIndexToLetter, parseAddress } from "./cell-address";
+import { colLetterToIndex, colIndexToLetter, parseAddress } from "./cellAddress";
 
 export interface MergeRegion {
   originAddress: string;

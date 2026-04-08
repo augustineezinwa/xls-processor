@@ -1,6 +1,6 @@
 import type { RowType } from "@/types";
 import type { FormulaMap } from "@/types";
-import { parseAddress } from "./cell-address";
+import { parseAddress } from "./cellAddress";
 
 interface RawCell {
   address: string;

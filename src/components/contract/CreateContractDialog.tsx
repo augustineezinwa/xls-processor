@@ -4,8 +4,8 @@ import { useState, useRef, useMemo, memo } from "react";
 import { X, Printer } from "lucide-react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import type { ParsedSheet, SheetMutation } from "@/types";
-import { formatCellValue } from "@/lib/utils/number-format";
-import { exportContractToPDF } from "@/lib/export/contract-export";
+import { formatCellValue } from "@/lib/utils/numberFormat";
+import { exportContractToPDF } from "@/lib/export/contractExport";
 
 // ─── Default contract body text ───────────────────────────────────────────────
 const DEFAULT_CONTRACT_TEXT = `This Contract Agreement ("Agreement") is entered into as of the date specified above, between the Supplier/Provider and the Client/Buyer identified herein.

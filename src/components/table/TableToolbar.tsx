@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { RotateCcw, FileSpreadsheet, Upload, FileDown, FileText } from "lucide-react";
 import { useWorkbookStore, useSheetMutation } from "@/lib/hooks/useWorkbook";
-import { exportSheetToPDF } from "@/lib/export/pdf-export";
+import { exportSheetToPDF } from "@/lib/export/pdfExport";
 import { CreateContractDialog } from "@/components/contract/CreateContractDialog";
 import type { ParsedSheet } from "@/types";
 

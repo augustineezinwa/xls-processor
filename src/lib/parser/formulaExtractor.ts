@@ -1,5 +1,5 @@
 import type { FormulaEntry, FormulaMap, DependencyGraph, ComputationAxis } from "@/types";
-import { extractCellRefs, detectComputationAxis } from "./cell-address";
+import { extractCellRefs, detectComputationAxis } from "./cellAddress";
 
 interface RawFormulaCell {
   address: string;

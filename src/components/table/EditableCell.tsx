@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback, memo } from "react";
-import { parseInputValue, formatCellValue } from "@/lib/utils/number-format";
+import { parseInputValue, formatCellValue } from "@/lib/utils/numberFormat";
 import type { ParsedCell } from "@/types";
 
 /**

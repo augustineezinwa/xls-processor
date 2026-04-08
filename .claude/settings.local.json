@@ -70,7 +70,17 @@
       "Bash(npm run format -- src/lib/parser/row-classifier.ts)",
       "Bash(npm run format -- src/components/table/SpreadsheetTable.tsx)",
       "Bash(npm run format -- src/components/table/EditableCell.tsx)",
-      "Bash(npm run format -- src/components/contract/CreateContractDialog.tsx)"
+      "Bash(npm run format -- src/components/contract/CreateContractDialog.tsx)",
+      "Bash(git mv src/lib/formula-engine src/lib/formulaEngine)",
+      "Bash(git mv src/lib/formulaEngine/ref-parser.ts src/lib/formulaEngine/refParser.ts)",
+      "Bash(git mv src/lib/parser/cell-address.ts src/lib/parser/cellAddress.ts)",
+      "Bash(git mv src/lib/parser/column-inferrer.ts src/lib/parser/columnInferrer.ts)",
+      "Bash(git mv src/lib/parser/formula-extractor.ts src/lib/parser/formulaExtractor.ts)",
+      "Bash(git mv src/lib/parser/merged-cell-handler.ts src/lib/parser/mergedCellHandler.ts)",
+      "Bash(git mv src/lib/parser/row-classifier.ts src/lib/parser/rowClassifier.ts)",
+      "Bash(git mv src/lib/export/contract-export.ts src/lib/export/contractExport.ts)",
+      "Bash(git mv src/lib/export/pdf-export.ts src/lib/export/pdfExport.ts)",
+      "Bash(git mv src/lib/utils/number-format.ts src/lib/utils/numberFormat.ts)"
     ]
   }
 }

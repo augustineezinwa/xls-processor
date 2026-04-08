@@ -5,7 +5,7 @@ import type { ParsedSheet } from "@/types";
 import { SpreadsheetTable } from "@/components/table/SpreadsheetTable";
 import { TableToolbar } from "@/components/table/TableToolbar";
 import { useWorkbookStore, useSheetMutation } from "@/lib/hooks/useWorkbook";
-import { recomputeAll } from "@/lib/formula-engine";
+import { recomputeAll } from "@/lib/formulaEngine";
 
 interface SheetEditorProps {
   sheet: ParsedSheet;

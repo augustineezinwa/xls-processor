@@ -13,11 +13,11 @@
 import ExcelJS from "exceljs";
 import { randomUUID } from "crypto";
 import type { ParsedWorkbook, ParsedSheet, ParsedRow, ParsedCell, ComputationAxis } from "@/types";
-import { buildFormulaGraph, getAllTreeAddresses } from "./formula-extractor";
-import { parseMergeRegions, buildMergeLookup } from "./merged-cell-handler";
-import { classifyRows } from "./row-classifier";
-import { inferColumns } from "./column-inferrer";
-import { colIndexToLetter, detectComputationAxis } from "./cell-address";
+import { buildFormulaGraph, getAllTreeAddresses } from "./formulaExtractor";
+import { parseMergeRegions, buildMergeLookup } from "./mergedCellHandler";
+import { classifyRows } from "./rowClassifier";
+import { inferColumns } from "./columnInferrer";
+import { colIndexToLetter, detectComputationAxis } from "./cellAddress";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
